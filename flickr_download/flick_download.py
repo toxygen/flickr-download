@@ -78,15 +78,16 @@ def download_list(list, directory, size_label=None):
             continue
 		
         print 'Saving: {0}'.format(fname)
-        photo.save(fname, size_label)
-		
-        # Set file times to when the photo was taken
-        info = photo.getInfo()
-        taken = parser.parse(info['taken'])
-        taken_unix = time.mktime(taken.timetuple())
-        os.utime(fname, (taken_unix, taken_unix))
-
-    os.chdir("..")
+		# Must be in try block as sometimes flickr returns 404 not found
+        try:
+            photo.save(fname, size_label)
+			 # Set file times to when the photo was taken
+            info = photo.getInfo()
+            taken = parser.parse(info['taken'])
+            taken_unix = time.mktime(taken.timetuple())
+            os.utime(fname, (taken_unix, taken_unix))
+        except:
+            print "Ooops photo couldn't be downloaded"
 
 def download_set(set_id, size_label=None):
     """
@@ -157,7 +158,7 @@ def main():
     parser.add_argument('-s', '--api_secret', type=str,
                         help='Flickr API secret')
     parser.add_argument('-t', '--api_token', action='store_true',
-						help='Use OAuth token')
+                        help='Use OAuth token')
     parser.add_argument('-l', '--list', type=str,
                         help='List photosets for a user')
     parser.add_argument('-p', '--photos', type=str,
@@ -165,9 +166,9 @@ def main():
     parser.add_argument('-d', '--download', type=str,
                         help='Download the given set')
     parser.add_argument('-u', '--photostream', type=str,
-						help='Download photostream of user')
+                        help='Download photostream of user')
     parser.add_argument('-o', '--photosets', type=str,
-						help='Download all photosets of user')
+                        help='Download all photosets of user')
     parser.add_argument('-x', '--all', type=str,
                         help='Download all photosets and photos of user')
 
